@@ -51,6 +51,7 @@ class Settings(object):
     def __init__(self):
         # Set defaults
         self.AUDIENCE = None  # Required
+        self.ISSUER = None  # Required
         self.BLOCK_GUEST_USERS = False
         self.BOOLEAN_CLAIM_MAPPING = {}
         self.CA_BUNDLE = True
@@ -85,11 +86,11 @@ class Settings(object):
             "CLIENT_ID",
             "RELYING_PARTY_ID",
             "USERNAME_CLAIM",
+            "ISSUER",
         ]
 
         deprecated_settings = {
             "AUTHORIZE_PATH": "This setting is automatically loaded from ADFS.",
-            "ISSUER": "This setting is automatically loaded from ADFS.",
             "LOGIN_REDIRECT_URL": "Instead use the standard Django settings with the same name.",
             "REDIR_URI": "This setting is automatically determined based on the URL configuration of Django.",
             "SIGNING_CERT": "The token signing certificates are automatically loaded from ADFS.",
@@ -234,7 +235,6 @@ class ProviderConfig(object):
             logger.info("authorization endpoint: %s", self.authorization_endpoint)
             logger.info("token endpoint:         %s", self.token_endpoint)
             logger.info("end session endpoint:   %s", self.end_session_endpoint)
-            logger.info("issuer:                 %s", self.issuer)
             logger.info("msgraph endpoint:       %s", self.msgraph_endpoint)
 
     def _load_openid_config(self):
@@ -268,7 +268,7 @@ class ProviderConfig(object):
             self.token_endpoint = openid_cfg["token_endpoint"]
             self.end_session_endpoint = openid_cfg["end_session_endpoint"]
             if settings.TENANT_ID != 'adfs':
-                self.issuer = openid_cfg["issuer"]
+                self.issuer = settings.ISSUER
                 self.msgraph_endpoint = openid_cfg["msgraph_host"]
             else:
                 self.issuer = openid_cfg["access_token_issuer"]
